@@ -1,4 +1,6 @@
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 int main(void)
 {
@@ -16,8 +18,15 @@ int main(void)
         return -1;
     }
 
+
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+    if (glewInit() != GLEW_OK) {
+        std::cout << "Error!" << std::endl;
+    }
+    else
+        std::cout << "WOW IT WORKS, ALSO IT LOOKS COOL TO ADD CONSOLE PRINT STATEMENTS HAHA" << std::endl;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
