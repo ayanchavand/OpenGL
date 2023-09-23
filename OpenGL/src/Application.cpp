@@ -91,6 +91,8 @@ int main(void){
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1);
+
     if (glewInit() != GLEW_OK) {
         std::cout << "Error!" << std::endl;
     }
@@ -100,10 +102,16 @@ int main(void){
     std::cout << glGetString(GL_VERSION) << std::endl;
     
     //positions of the triangle
-    float positions[6] = {
-        -0.5, -0.5,
-        0.0, 0.5,
-        0.5, -0.5
+    float positions[] = {
+        -0.5, -0.5, //0
+        0.5, -0.5,  //1
+        0.5, 0.5,   //2
+        -0.5, 0.5   //3
+    };
+
+    unsigned int indicies[] = {
+        0,1,2,
+        2,3,0
     };
     
     //declaration of an unsigned int whose address is used as the buffer id
@@ -114,26 +122,21 @@ int main(void){
     //selects the above buffer and usses it as buffer for vertex data
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     //creates a memory allocation in the GPU for the sleceted buffer 
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW);
     //enables use of vertex attributes from the buffer
     glEnableVertexAttribArray(0);
     //defines the vertext attributes and how should they be interpreted for rendering
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
 
-    //source code for vs and fs shaders
-    //std::string vs = "#version 330 core\n"
-    //    "layout(location = 0) in vec4 position;\n"
-    //    "void main()\n"
-    //    "{\n"
-    //    "   gl_Position = position;\n"
-    //    "};";
-    //
-    //std::string fs = "#version 330 core\n"
-    //    "layout (location = 0) out vec4 color;\n"
-    //    "void main()\n"
-    //    "{\n"
-    //    "    color = vec4(1, 0, 0, 1);\n"
-    //    "};";
+
+    unsigned int ibo;
+    //generated a buffer, takes argument as the size of the buffer and buffer id
+    glGenBuffers(1, &ibo);
+    //selects the above buffer and usses it as buffer for vertex data
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    //creates a memory allocation in the GPU for the sleceted buffer 
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indicies, GL_STATIC_DRAW);
+
 
     std::string vs = GetShader("res/shaders/vs/basic.shader");
     std::string fs = GetShader("res/shaders/fs/basic.shader");
@@ -142,14 +145,24 @@ int main(void){
     unsigned int shader = CreateShader(vs, fs);
     glUseProgram(shader);
 
+    int location = glGetUniformLocation(shader, "u_Color");
+    
+    float i = 0;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
-    {
+    {   
+        
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        i += 0.07;
+        if (i >1.0) {
+            i = 0;
+        }
+
+        glUniform4f(location, i, 0.3, 0.4, 1);
         //Draw call for the bound/selected buffer
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6,GL_UNSIGNED_INT, nullptr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
