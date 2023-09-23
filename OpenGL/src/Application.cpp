@@ -1,7 +1,23 @@
 #include <GL/glew.h>    //finds the drivers and gets us access to OpenGL functions accordingly
 #include <GLFW/glfw3.h> //used to open windows in a partciular os (used for cross platform compatibility)
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
+static std::string GetShader(const std::string& filepath) {
+       
+    std::ifstream stream(filepath);
+    std::string shaderCode;
+
+    if (stream) {
+        std::ostringstream ss;
+        ss << stream.rdbuf();
+        shaderCode = ss.str();
+    }
+    
+    std::cout << shaderCode;
+    return shaderCode;
+}
 
 static unsigned int CompileShader(unsigned int type, const std::string& source){   
 
@@ -105,19 +121,23 @@ int main(void){
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
 
     //source code for vs and fs shaders
-    std::string vs = "#version 330 core\n"
-        "layout(location = 0) in vec4 position;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = position;\n"
-        "};";
+    //std::string vs = "#version 330 core\n"
+    //    "layout(location = 0) in vec4 position;\n"
+    //    "void main()\n"
+    //    "{\n"
+    //    "   gl_Position = position;\n"
+    //    "};";
+    //
+    //std::string fs = "#version 330 core\n"
+    //    "layout (location = 0) out vec4 color;\n"
+    //    "void main()\n"
+    //    "{\n"
+    //    "    color = vec4(1, 0, 0, 1);\n"
+    //    "};";
 
-    std::string fs = "#version 330 core\n"
-        "layout (location = 0) out vec4 color;\n"
-        "void main()\n"
-        "{\n"
-        "    color = vec4(1, 0, 0, 1);\n"
-        "};";
+    std::string vs = GetShader("res/shaders/vs/basic.shader");
+    std::string fs = GetShader("res/shaders/fs/basic.shader");
+    std::cout << "#SHADER CODE\n" << vs << "#FRAGMENT CODE\n" << fs;
 
     unsigned int shader = CreateShader(vs, fs);
     glUseProgram(shader);
