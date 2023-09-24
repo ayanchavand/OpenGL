@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 
+//Gets shader source code from the .shder files
 static std::string GetShader(const std::string& filepath) {
        
     std::ifstream stream(filepath);
@@ -91,6 +92,7 @@ int main(void){
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    //Enables V-Sync
     glfwSwapInterval(1);
 
     if (glewInit() != GLEW_OK) {
@@ -137,11 +139,12 @@ int main(void){
     //creates a memory allocation in the GPU for the sleceted buffer 
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indicies, GL_STATIC_DRAW);
 
-
+    //Gets Shader source code 
     std::string vs = GetShader("res/shaders/vs/basic.shader");
     std::string fs = GetShader("res/shaders/fs/basic.shader");
     std::cout << "#SHADER CODE\n" << vs << "#FRAGMENT CODE\n" << fs;
 
+    //Creates shader program and assigns it to the selected rendering object
     unsigned int shader = CreateShader(vs, fs);
     glUseProgram(shader);
 
